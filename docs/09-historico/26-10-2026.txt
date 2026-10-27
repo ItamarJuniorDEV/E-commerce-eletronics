@@ -1,0 +1,121 @@
+HISTÓRICO DE DESENVOLVIMENTO
+Data: 26/10/2026
+Projeto: E-commerce de Equipamentos Eletrônicos
+
+========================================
+1. CONFIGURAÇÃO INICIAL
+========================================
+
+- Conferido workspace local em C:\Users\cdaju\Downloads\E-commerce-eletronics.
+- git status -sb: branch main alinhada à referência local de origin/main, sem alterações iniciais.
+- git log -1 --oneline: a1008d2 no início da sessão.
+- Sem reinstalação da stack.
+
+Resultado: trabalho retomado sobre a base esperada.
+
+========================================
+2. BANCO DE DADOS
+========================================
+
+- Reaproveitadas as tabelas roles, permissions, role_user e permission_role existentes.
+- Nenhuma nova migration criada nesta entrega.
+- Testes criaram relações e dados temporários para validar autorização.
+- Driver dos testes locais não confirmado diretamente pelo log; phpunit.xml tem SQLite em memória como padrão, enquanto CI remoto usa PostgreSQL.
+
+Resultado: nenhuma mudança de schema.
+
+========================================
+3. AUTENTICAÇÃO E AUTORIZAÇÃO
+========================================
+
+- Definido com o desenvolvedor o encaminhamento da PEN-10: catálogo de permissões controlado no código; administrador atribui permissões aos papéis pelo painel, sem criar novas permissões livremente.
+- Documentação de PEN-10 foi preparada fora do repositório; instalação da atualização na pasta local não foi comprovada.
+- Adicionado User::hasPermission(string $permission): bool usando roles(), whereHas('permissions') e exists().
+- Registrado Gate roles.manage em AppServiceProvider usando o método hasPermission().
+- Adicionada rota provisória GET /admin/roles, protegida por auth, verified e can:roles.manage.
+- A rota responde JSON para testar autorização; não constitui tela de gestão de papéis.
+
+Resultado: primeira autorização real de rota implementada e testada.
+
+========================================
+4. FRONTEND
+========================================
+
+- Nenhuma tela de gestão administrativa criada.
+- Permaneceram as telas do starter kit.
+- Frontend passou em lint, formatação e verificação TypeScript.
+
+========================================
+5. TESTES E QUALIDADE
+========================================
+
+- Criado UserPermissionsTest.php com 4 testes da consulta de permissões.
+- Criado RoleAuthorizationTest.php com 3 testes do Gate.
+- Criado RoleAccessTest.php com 4 testes HTTP (autorizado, sem permissão, sem papel e visitante).
+- Ajustadas formatações apontadas pelo Pint em User.php e routes/web.php.
+- Execução geral local: 59 testes aprovados, 165 asserções.
+- Frontend: 70 arquivos formatados; lint em 64 arquivos aprovado.
+- TypeScript: aprovado.
+- Pint: 66 arquivos aprovados.
+- PHPStan/Larastan: 45 arquivos, nenhum erro.
+- git diff --cached --check: sem problemas.
+
+Resultado: entrega de autorização aprovada localmente.
+
+========================================
+6. GIT E GITHUB
+========================================
+
+Commit realizado na noite de 26/10 (horário de Brasília):
+
+8cb2c2c - feat(auth): implementar autorização por permissões e proteção de rota
+
+- Alterados 6 arquivos; 217 linhas adicionadas.
+- Commit criado na main e enviado com git push origin main.
+- Push confirmado no terminal: a1008d2..8cb2c2c.
+- GitHub registra commit em 27/10 às 00:42 UTC, equivalente a 26/10 às 21:42 em Brasília.
+- CI remoto concluído com sucesso para o commit 8cb2c2c.
+- https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/40428169714
+
+Resultado: primeira autorização por Gate publicada e CI aprovado.
+
+========================================
+7. ORGANIZAÇÃO DO PROJETO
+========================================
+
+- Mantido aprendizado guiado: desenvolvedor implementa, IA revisa e explica conceitos.
+- Explicados whereHas(), where(), exists(), método auxiliar e Gate.
+- Mantida organização de testes em tests/Feature e padrão de commit em português.
+- /docs permanece ignorada no Git.
+
+========================================
+8. PENDÊNCIAS
+========================================
+
+- Substituir rota provisória JSON por operação administrativa real conforme requisitos.
+- Implementar catálogo controlado de permissões e atribuição por painel, conforme decisão da PEN-10.
+- Conferir se a atualização da documentação foi aplicada localmente.
+- Concluir gestão de usuários/papéis, políticas de titularidade, 2FA interno, sessões, endereços e demais requisitos S01.
+- Reavaliar avisos de dependências npm.
+
+========================================
+9. PRÓXIMO PASSO
+========================================
+
+Continuar a S01 pela próxima menor entrega administrativa real prevista na documentação; conferir requisitos e critérios de aceite antes do código. O endpoint JSON de /admin/roles é provisório.
+
+Implementar, revisar, testar acesso permitido/negado e somente depois fazer commit e push.
+
+========================================
+10. ESTADO AO ENCERRAR O DIA
+========================================
+
+Autenticação básica: preservada.
+Papéis e permissões: relacionamentos implementados.
+Método hasPermission(): implementado e testado.
+Gate roles.manage: implementado e testado.
+Rota GET /admin/roles: protegida e testada, mas provisória.
+Qualidade local: 59 testes e 165 asserções aprovadas.
+CI GitHub: aprovado no commit 8cb2c2c.
+Último commit validado: 8cb2c2c.
+S01: em andamento; gestão administrativa definitiva ainda pendente.

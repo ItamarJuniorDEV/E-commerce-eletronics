@@ -1,0 +1,102 @@
+HISTÓRICO DE DESENVOLVIMENTO
+Data: 24/10/2026
+Projeto: E-commerce de Equipamentos Eletrônicos
+
+========================================
+1. CONFIGURAÇÃO INICIAL
+========================================
+
+- Retomada a etapa S01 — identidade, contas e permissões.
+- Mantida a base Laravel 13 + React/Inertia + PostgreSQL.
+- Mantido o desenvolvimento tradicional: implementar, revisar, testar e validar.
+
+Resultado: nenhuma reinstalação necessária.
+
+========================================
+2. BANCO DE DADOS
+========================================
+
+- Criada migration 2026_10_25_005633_create_permissions_table.php.
+- Criada migration 2026_10_25_011816_create_permission_role_table.php.
+- permissions: id, slug único, description e timestamps.
+- permission_role: role_id, permission_id, chaves estrangeiras e combinação única.
+- Migrações executadas localmente, conforme histórico de 24/10.
+
+Resultado: estrutura relacional de permissões preparada.
+
+========================================
+3. AUTENTICAÇÃO
+========================================
+
+- Criado Model Permission com relacionamento roles().
+- Atualizado Role com permissions().
+- Ajustados Fillable e PHPDoc dos Models envolvidos.
+- Ainda não foram criados Gates/Policies nem proteção de rotas nesta entrega.
+
+Resultado: estrutura de papéis e permissões concluída; autorização real pendente.
+
+========================================
+4. FRONTEND
+========================================
+
+- Nenhuma tela de negócio nova implementada.
+- Frontend permaneceu no starter kit existente.
+
+========================================
+5. TESTES E QUALIDADE
+========================================
+
+- Criados quatro testes em tests/Feature/RolePermissionsTest.php.
+- Testadas relações entre papéis e permissões e restrições de duplicidade.
+- Histórico e CI registraram 48 testes aprovados e 152 asserções.
+- Pint, PHPStan/Larastan, TypeScript e verificações de frontend aprovados.
+
+Resultado: base relacional validada; autorização HTTP não testada nesta entrega.
+
+========================================
+6. GIT E GITHUB
+========================================
+
+Commit realizado na noite de 24/10 (horário de Brasília):
+
+a1008d2 - feat(auth): adicionar estrutura de permissões por papel
+
+- GitHub registra o commit em 25/10 às 02:54 UTC, correspondente a 24/10 às 23:54 em Brasília.
+- Push para main concluído.
+- CI remoto aprovado: https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/40156345199
+
+Resultado: estrutura publicada e verificada.
+
+========================================
+7. ORGANIZAÇÃO DO PROJETO
+========================================
+
+- Mantida a documentação local em /docs, fora do Git.
+- Preservada a regra de uma entrega pequena por vez.
+- Código escrito pelo desenvolvedor com orientação da IA.
+
+========================================
+8. PENDÊNCIAS
+========================================
+
+- PEN-10: decidir como manter o catálogo de permissões.
+- Definir permissões concretas e aplicar autorização no backend.
+- Testar HTTP permitido, proibido e não autenticado.
+- Concluir contas internas, 2FA, sessões, endereços e demais requisitos S01.
+- Reavaliar os avisos npm do CI.
+
+========================================
+9. PRÓXIMO PASSO
+========================================
+
+Conferir PEN-10, matriz de perfis e requisitos de autorização. Depois, implementar primeira verificação real de permissão por operação, com testes.
+
+========================================
+10. ESTADO AO ENCERRAR O DIA
+========================================
+
+Estrutura User ↔ Role ↔ Permission: implementada.
+Testes: 48 aprovados, 152 asserções.
+CI remoto: aprovado.
+Autorização real: ainda pendente.
+Último commit: a1008d2.

@@ -1,0 +1,107 @@
+HISTÓRICO DE DESENVOLVIMENTO
+Data: 23/10/2026
+Projeto: E-commerce de Equipamentos Eletrônicos
+
+========================================
+1. CONFIGURAÇÃO INICIAL
+========================================
+
+- Mantida a base Laravel 13, React/Inertia e PostgreSQL preparada em 22/10.
+- Iniciada a etapa S01 — identidade, contas e permissões.
+- Desenvolvimento guiado: usuário implementa, IA orienta e revisa.
+
+Resultado: ambiente existente reutilizado, sem reinstalação.
+
+========================================
+2. BANCO DE DADOS
+========================================
+
+- Criada a migration de roles (id, name, slug único e timestamps).
+- Criada a pivot role_user com user_id, role_id, FKs e combinação única.
+- Tabela users existente preservada.
+- Migrações executadas localmente conforme histórico do dia.
+
+Resultado: banco preparado para múltiplos papéis por usuário.
+
+========================================
+3. AUTENTICAÇÃO
+========================================
+
+- Criado o Model Role com relacionamento users().
+- Adicionado roles() ao Model User.
+- Adicionadas anotações de tipo para o Larastan.
+- Autenticação básica do starter kit preservada.
+
+Resultado: associação entre usuários e papéis implementada; autorização real ainda ausente.
+
+========================================
+4. FRONTEND
+========================================
+
+- Nenhuma tela específica de gestão de papéis criada.
+- Verificações de frontend continuaram aprovadas no CI.
+
+Resultado: frontend base preservado.
+
+========================================
+5. TESTES E QUALIDADE
+========================================
+
+- Criados quatro testes em tests/Feature/UserRolesTest.php.
+- Cobertos: múltiplos papéis por usuário, múltiplos usuários por papel e rejeição de duplicidades.
+- Ajustado limite de memória do PHPStan para 512M.
+- Corrigida formatação apontada pelo Pint.
+- Histórico do dia registra 44 testes e 146 asserções aprovados.
+
+Resultado: relações entre usuários e papéis verificadas; não há teste de bloqueio HTTP por papel nesta entrega.
+
+========================================
+6. GIT E GITHUB
+========================================
+
+Commits realizados em 23/10 (horário de Brasília):
+
+d55a8c9 - feat(auth): adicionar funções e vínculos com usuários
+e843cd8 - chore: ajustar limite de memória do PHPStan
+07b4338 - chore: ignorar configurações locais do Claude
+
+- Alterações enviadas à branch main.
+- CI remoto aprovado para 07b4338.
+- Referência: https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/40019998167
+
+Resultado: estrutura de papéis publicada e validada no CI.
+
+========================================
+7. ORGANIZAÇÃO DO PROJETO
+========================================
+
+- /docs continuou ignorada no Git.
+- .claude adicionada ao .gitignore.
+- Documentação de retomada e histórico do trabalho mantidos separadamente do código remoto.
+- Mantido padrão de commits em português brasileiro.
+
+========================================
+8. PENDÊNCIAS
+========================================
+
+- Definir catálogo de permissões (PEN-10).
+- Criar estrutura de permissões e vinculação aos papéis.
+- Implementar autorização efetiva no backend.
+- Diferenciar contas internas e clientes, além de demais requisitos S01.
+- Definir e testar exclusão de contas/papéis com vínculos.
+
+========================================
+9. PRÓXIMO PASSO
+========================================
+
+Continuar S01 com a estrutura de permissões: Model Permission, tabela permissions, pivot permission_role e testes correspondentes. Não confundir relacionamentos com autorização.
+
+========================================
+10. ESTADO AO ENCERRAR O DIA
+========================================
+
+Base técnica: mantida.
+Papéis e vínculos com usuários: implementados e testados.
+Permissões dos papéis: ainda não implementadas neste dia.
+Autorização real: pendente.
+Último commit do dia: 07b4338.
