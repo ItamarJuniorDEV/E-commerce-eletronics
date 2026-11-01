@@ -24,6 +24,16 @@ Arquivos preparados no stage (5):
   - Configuracao/outros: scripts/git/atualizar-historico.php
 Validações: não inferidas pelo hook; conferir logs do composer qa/CI.
 Commit/SHA: não disponível antes da criação; consultar git log.
+
+Registro 01/11/2026 02:25:17 BRT [b4f02a2fc170f986]
+Arquivos preparados no stage (5):
+  - Backend: app/Http/Controllers/Admin/RoleController.php
+  - Backend: app/Http/Requests/Admin/StoreRoleRequest.php
+  - Frontend: resources/js/pages/admin/roles.tsx
+  - Backend: routes/web.php
+  - Testes: tests/Feature/Admin/RoleManagementTest.php
+Validações: não inferidas pelo hook; conferir logs do composer qa/CI.
+Commit/SHA: não disponível antes da criação; consultar git log.
 <!-- AUTO-HISTORICO-FIM -->
 
 ========================================
