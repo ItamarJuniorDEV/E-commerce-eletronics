@@ -16,6 +16,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('admin/roles', [RoleController::class, 'store'])
         ->middleware('can:roles.manage')
         ->name('admin.roles.store');
+
+    Route::patch('admin/roles/{role}', [RoleController::class, 'update'])
+        ->middleware('can:roles.manage')
+        ->name('admin.roles.update');
 });
 
 require __DIR__.'/settings.php';

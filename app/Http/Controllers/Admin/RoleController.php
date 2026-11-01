@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoleRequest;
+use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Models\Role;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -28,6 +29,15 @@ class RoleController extends Controller
         $data = $request->validated();
 
         Role::create($data);
+
+        return to_route('admin.roles.index');
+    }
+
+    public function update(UpdateRoleRequest $request, Role $role): RedirectResponse
+    {
+        $data = $request->validated();
+
+        $role->update($data);
 
         return to_route('admin.roles.index');
     }

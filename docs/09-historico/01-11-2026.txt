@@ -40,6 +40,17 @@ Arquivos preparados no stage (1):
   - Documentacao: docs/05-implementacao/05-acompanhamento-etapas.md
 Validações: não inferidas pelo hook; conferir logs do composer qa/CI.
 Commit/SHA: não disponível antes da criação; consultar git log.
+
+Registro 01/11/2026 20:48:59 BRT [029f7c6df0d54bbe]
+Arquivos preparados no stage (6):
+  - Backend: app/Http/Controllers/Admin/RoleController.php
+  - Backend: app/Http/Requests/Admin/UpdateRoleRequest.php
+  - Documentacao: docs/05-implementacao/05-acompanhamento-etapas.md
+  - Frontend: resources/js/pages/admin/roles.tsx
+  - Backend: routes/web.php
+  - Testes: tests/Feature/Admin/RoleManagementTest.php
+Validações: não inferidas pelo hook; conferir logs do composer qa/CI.
+Commit/SHA: não disponível antes da criação; consultar git log.
 <!-- AUTO-HISTORICO-FIM -->
 
 ========================================

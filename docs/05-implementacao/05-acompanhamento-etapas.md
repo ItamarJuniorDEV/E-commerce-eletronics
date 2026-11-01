@@ -1,166 +1,185 @@
 # Acompanhamento das etapas — S01: Identidade, Conta, RBAC e Administração
 
-> **Documento de continuidade entre sessões.** Atualizado em **01/11/2026**.
-> **Fonte de verdade:** código + testes + execução no navegador + commits. O planejamento sozinho não comprova implementação.
+> **Documento de continuidade entre sessões.** Atualizado em **01/11/2026** (horário de Brasília).
 >
-> **Legenda:** ✅ implementado e validado no escopo indicado; ❌ falta implementar, completar ou comprovar. Não usar a quantidade de itens marcados para calcular uma porcentagem sem auditoria.
+> **Fonte de verdade:** código, testes executados, observação no navegador e commits publicados. Planejamento e relatos antigos não substituem evidências recentes.
+>
+> **Legenda:** ✅ implementado e comprovado no escopo indicado; ⏳ implementado localmente, mas aguardando publicação ou validação adicional; ❌ ainda falta implementar, concluir ou comprovar. Não calcular percentual de conclusão sem auditoria.
 
 ## 0. Ponto de retomada
 
-- **Etapa:** S01 em andamento. **S02 (catálogo) ainda não iniciada.**
-- **Última funcionalidade concluída:** cadastro de papéis, passo 15.
-- **Próxima funcionalidade recomendada:** **passo 16, edição de papéis**, com testes Pest, proteção de acesso, navegador, `composer qa`, commit e push.
-- **Últimos commits publicados:** `c2778f6` (automatização do histórico) e `54b6bf5` (cadastro de papéis), na `main`.
-- **Qualidade local confirmada em 01/11/2026:** `composer qa`: **70 testes, 218 asserções**, PHPStan sem erros, TypeScript, lint e build aprovados.
-- **CI remoto do commit `54b6bf5`:** **não confirmado** na última checagem, não registrar como aprovado sem evidência.
-- **Decisões abertas:** PEN-10 (catálogo de permissões), PEN-15 (autenticação interna, 2FA e sessões), PEN-13 (privacidade e retenção).
+- **Etapa:** S01 em andamento. **S02 (catálogo de produtos) não iniciada.**
+- **Última funcionalidade implementada:** **passo 16, edição de papéis**, com backend, validação, proteção de acesso e formulário React. **Validada localmente; ainda não publicada.**
+- **Última funcionalidade publicada:** passo 15, cadastro de papéis.
+- **Próxima ação imediata:** revisar o diff completo dos arquivos alterados, incluir o novo `UpdateRoleRequest.php`, atualizar este acompanhamento, fazer commit e push após revisão e conferir o CI remoto.
+- **Último commit publicado na `main`:** `ebbd1df` (`docs(s01): atualizar plano de acompanhamento`). O Git local informou `HEAD -> main, origin/main` nesse commit antes das alterações do passo 16.
+- **Estado local do Git informado em 01/11/2026:** cinco arquivos modificados e um arquivo novo ainda não rastreado. Nenhum commit ou push do passo 16 foi comprovado.
+- **Qualidade local comprovada em 01/11/2026:** `composer qa` aprovado com **85 testes e 262 asserções**; PHPStan sem erros; TypeScript, lint, formatação e build aprovados.
+- **Testes de gestão de papéis:** `RoleManagementTest.php` com **23 testes e 66 asserções** aprovados (cadastro e edição).
+- **Navegador:** formulário de edição abriu com dados preenchidos; alteração de nome foi salva e persistiu após F5; slug duplicado foi rejeitado e o registro permaneceu inalterado após F5.
+- **Último CI remoto identificado:** execução do commit `ebbd1df` **falhou por formatação deste documento**, antes de executar os testes. O `composer qa` local posterior aplicou correção de formatação; **o CI ainda não validou essa correção no remoto**. Evidência: https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/41278242215
+- **Decisões a formalizar ou concluir:** PEN-10 (o histórico de 31/10 registra catálogo de permissões controlado no código, mas ADR/documentação e gestão efetiva permanecem pendentes), PEN-15 (autenticação interna, 2FA e sessões) e PEN-13 (privacidade e retenção).
 
 ## 1. Autenticação e conta do cliente
 
-| Status | Funcionalidade | Evidência ou pendência |
-|---|---|---|
-| ✅ | Cadastro de cliente | Testes do starter Laravel/Fortify (`RegistrationTest`) |
-| ✅ | Login do cliente | `AuthenticationTest` |
-| ✅ | Logout | `AuthenticationTest` |
-| ✅ | Recuperar senha | `PasswordResetTest` |
-| ✅ | Verificar e-mail | `EmailVerificationTest` |
-| ✅ | Limitar tentativas de login | `AuthenticationTest` |
-| ✅ | Alterar nome e e-mail do perfil | `ProfileUpdateTest` |
-| ✅ | Alterar senha | `SecurityTest` |
-| ✅ | Suporte técnico a 2FA e passkeys | Fortify / `SecurityTest`; **ainda não são obrigatórios para internos** |
-| ❌ | Cadastrar endereço | CRUD não comprovado |
-| ❌ | Editar endereço | CRUD não comprovado |
-| ❌ | Remover endereço | CRUD não comprovado |
-| ❌ | Escolher endereço padrão | Não comprovado |
-| ❌ | Visualizar sessões ativas | Não comprovado |
-| ❌ | Encerrar sessões ativas | Não comprovado |
-| ❌ | Registrar eventos relevantes de autenticação | Eventos/auditoria não comprovados |
+| Status | Funcionalidade                               | Evidência ou pendência                                                                   |
+| ------ | -------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| ✅     | Cadastro de cliente                          | Laravel/Fortify; `RegistrationTest`                                                      |
+| ✅     | Login do cliente                             | `AuthenticationTest`                                                                     |
+| ✅     | Logout                                       | `AuthenticationTest`                                                                     |
+| ✅     | Recuperar senha                              | `PasswordResetTest`                                                                      |
+| ✅     | Verificar e-mail                             | `EmailVerificationTest`                                                                  |
+| ✅     | Limitar tentativas de login                  | `AuthenticationTest`                                                                     |
+| ✅     | Alterar nome e e-mail do perfil              | `ProfileUpdateTest`                                                                      |
+| ✅     | Alterar senha                                | `SecurityTest`                                                                           |
+| ✅     | Suporte técnico a 2FA e passkeys             | Fortify e interface de segurança; **não equivale a 2FA obrigatório para equipe interna** |
+| ❌     | Cadastrar endereço                           | CRUD não comprovado                                                                      |
+| ❌     | Editar endereço                              | CRUD não comprovado                                                                      |
+| ❌     | Remover endereço                             | CRUD não comprovado                                                                      |
+| ❌     | Escolher endereço padrão                     | Não comprovado                                                                           |
+| ❌     | Visualizar sessões ativas                    | Não comprovado                                                                           |
+| ❌     | Encerrar sessões ativas                      | Não comprovado                                                                           |
+| ❌     | Registrar eventos relevantes de autenticação | Auditoria não comprovada                                                                 |
 
 ## 2. Papéis (Roles)
 
-| Status | Funcionalidade | Evidência ou pendência |
-|---|---|---|
-| ✅ | Tabela `roles` e Model `Role` | Migrations e model |
-| ✅ | Tabela `role_user` | Relacionamento N:N e testes |
-| ✅ | Usuário com mais de um papel | `UserRolesTest` |
-| ✅ | Listagem no React/Inertia | `RoleController@index`, `roles.tsx`, `RoleAccessTest` |
-| ✅ | Cadastrar papel pelo formulário | `POST /admin/roles`, `RoleController@store`, `StoreRoleRequest` |
-| ✅ | Validar nome obrigatório | `RoleManagementTest` |
-| ✅ | Validar slug obrigatório | `RoleManagementTest` |
-| ✅ | Bloquear slug duplicado | `RoleManagementTest` e navegador |
-| ✅ | Bloquear slug inválido | `RoleManagementTest` e navegador |
-| ✅ | Bloquear acesso sem `roles.manage` | Rotas, Gate e testes GET/POST |
-| ❌ | **Editar papel** | **Passo 16, próxima fatia** |
-| ❌ | Definir se papel pode ser excluído/desativado | Regra de negócio a decidir, principalmente se estiver em uso |
+| Status | Funcionalidade                                                 | Evidência ou pendência                                                                                                                         |
+| ------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| ✅     | Tabela `roles` e Model `Role`                                  | Migrations e model                                                                                                                             |
+| ✅     | Tabela `role_user`                                             | Relacionamento N:N e testes                                                                                                                    |
+| ✅     | Usuário com mais de um papel                                   | `UserRolesTest`                                                                                                                                |
+| ✅     | Listagem no React/Inertia                                      | `RoleController@index`, `roles.tsx`, `RoleAccessTest`                                                                                          |
+| ✅     | Cadastro de papel pelo formulário                              | `POST /admin/roles`, `RoleController@store`, `StoreRoleRequest`                                                                                |
+| ✅     | Validação de nome e slug no cadastro                           | `RoleManagementTest`: obrigatoriedade, slug duplicado e formato inválido                                                                       |
+| ✅     | Bloqueio de acesso à listagem e ao cadastro sem `roles.manage` | Middleware, Gate e testes GET/POST                                                                                                             |
+| ⏳     | **Editar nome e slug de um papel**                             | **Passo 16:** `PATCH /admin/roles/{role}`, `RoleController@update`, `UpdateRoleRequest`, `roles.tsx`; aprovado localmente, publicação pendente |
+| ⏳     | Manter o mesmo slug ao editar o próprio papel                  | Validação `Rule::unique(...)->ignore(...)`; teste Pest aprovado                                                                                |
+| ⏳     | Bloquear edição com slug de outro papel                        | Teste Pest e navegador; erro exibido e valor antigo preservado após F5                                                                         |
+| ⏳     | Validar edição com dados inválidos                             | Testes de nome/slug obrigatórios, formato, tipo e tamanho; aprovados localmente                                                                |
+| ⏳     | Bloquear edição sem autorização                                | Testes de 403, visitante, e-mail não verificado e papel inexistente; aprovados localmente                                                      |
+| ❌     | Definir exclusão/desativação de papéis                         | Regra de negócio pendente, especialmente para papéis vinculados                                                                                |
+
+**Limite da evidência do passo 16:** o navegador foi conferido manualmente para abertura, salvamento e slug duplicado; não houve comprovação de uma suíte automatizada de navegador. O CI do passo 16 não foi executado remotamente.
 
 ## 3. Permissões (Permissions)
 
-| Status | Funcionalidade | Evidência ou pendência |
-|---|---|---|
-| ✅ | Tabela `permissions` e Model `Permission` | Migrations, model e testes |
-| ✅ | Tabela `permission_role` | Relacionamento e testes |
-| ✅ | Relacionar papéis com permissões no backend | `RolePermissionsTest` |
-| ✅ | `User::hasPermission()` | `UserPermissionsTest` |
-| ✅ | Gate `roles.manage` | `AppServiceProvider` |
-| ✅ | Bloquear listagem/cadastro de papéis sem permissão | `RoleAccessTest`, `RoleManagementTest` |
-| ❌ | **Definir catálogo de permissões (PEN-10)** | Decidir permissões fixas no código ou criadas no painel |
-| ❌ | Gerenciar catálogo de permissões conforme decisão PEN-10 | Interface/funcionalidade não comprovada |
-| ❌ | Atribuir e remover permissões dos papéis pelo painel | Não comprovado |
-| ❌ | Consultar permissões de cada papel pelo painel | Não comprovado |
-| ❌ | Proteger todas as demais operações administrativas com permissões adequadas | Hoje há prova específica para `roles.manage` |
+| Status | Funcionalidade                                                        | Evidência ou pendência                                                                                |
+| ------ | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| ✅     | Tabela `permissions` e Model `Permission`                             | Migrations, model e testes                                                                            |
+| ✅     | Tabela `permission_role`                                              | Relacionamento N:N e testes                                                                           |
+| ✅     | Relacionar papéis a permissões no backend                             | `RolePermissionsTest`                                                                                 |
+| ✅     | `User::hasPermission()`                                               | `UserPermissionsTest`                                                                                 |
+| ✅     | Gate `roles.manage`                                                   | `AppServiceProvider`                                                                                  |
+| ✅     | Proteger listagem e cadastro de papéis                                | `RoleAccessTest`, `RoleManagementTest`                                                                |
+| ⏳     | Proteger edição de papéis                                             | Middleware `can:roles.manage` e testes locais aprovados; publicação pendente                          |
+| ❌     | Formalizar a decisão PEN-10                                           | Histórico de 31/10 propõe catálogo controlado no código; ADR e atualização documental não comprovadas |
+| ❌     | Implementar gestão do catálogo conforme PEN-10                        | Não comprovada como funcionalidade administrativa                                                     |
+| ❌     | Atribuir/remover permissões de papéis pelo painel                     | Relacionamento existe no backend; interface não comprovada                                            |
+| ❌     | Consultar permissões de cada papel pelo painel                        | Não comprovado                                                                                        |
+| ❌     | Proteger as demais operações administrativas com permissões adequadas | Evidência atual restrita às operações de papéis                                                       |
 
 ## 4. Funcionários e administração
 
-| Status | Funcionalidade | Evidência ou pendência |
-|---|---|---|
-| ❌ | Cadastrar funcionários pelo painel | Não comprovado |
-| ❌ | Editar funcionários | Não comprovado |
-| ❌ | Ativar/desativar funcionários | Não comprovado |
-| ❌ | Atribuir um ou vários papéis a funcionários pelo painel | Relação N:N existe; gestão no painel não |
-| ❌ | Consultar os acessos de cada funcionário | Não comprovado |
-| ❌ | Impedir operação de funcionário desativado com sessão antiga | Não comprovado |
-| ❌ | Impedir ficar sem administrador ativo | Regra RF-13-014 não comprovada |
-| ❌ | Área administrativa separada da área do cliente | Existe uma página `admin/roles`, não um painel administrativo separado completo |
-| ❌ | Dashboard inicial protegido por perfil | Página do starter não equivale a dashboard administrativo por permissões |
-| ❌ | Auditar alterações de papéis e permissões | Não comprovado |
+| Status | Funcionalidade                                                  | Evidência ou pendência                                                  |
+| ------ | --------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ❌     | Cadastrar funcionários pelo painel                              | Não comprovado                                                          |
+| ❌     | Editar funcionários                                             | Não comprovado                                                          |
+| ❌     | Ativar/desativar funcionários                                   | Não comprovado                                                          |
+| ❌     | Atribuir um ou vários papéis a funcionários pelo painel         | Relação N:N existe; gestão pela interface não                           |
+| ❌     | Consultar os acessos de cada funcionário                        | Não comprovado                                                          |
+| ❌     | Impedir operação de funcionário desativado usando sessão antiga | Não comprovado                                                          |
+| ❌     | Impedir ficar sem administrador ativo                           | Regra RF-13-014 não comprovada                                          |
+| ❌     | Separar painel administrativo da área do cliente                | Existe `admin/roles`, mas não painel administrativo completo e separado |
+| ❌     | Proteger dashboard inicial por perfil                           | Página do starter não equivale a dashboard administrativo por permissão |
+| ❌     | Auditar alterações de papéis e permissões                       | Não comprovado                                                          |
 
 ## 5. Segurança obrigatória
 
-| Status | Funcionalidade | Evidência ou pendência |
-|---|---|---|
-| ✅ | Restringir GET `/admin/roles` | Middleware + testes |
-| ✅ | Restringir POST `/admin/roles` | Middleware + testes |
-| ✅ | Negar cadastro a visitante ou usuário sem permissão | `RoleManagementTest` |
-| ❌ | **Definir login interno, 2FA e sessões (PEN-15)** | Decisão pendente |
-| ❌ | **Exigir 2FA para operações administrativas** | Suporte do Fortify não equivale a exigência |
-| ❌ | Invalidar ou negar operação de funcionário desativado | Não comprovado |
-| ❌ | Implementar Policies para titularidade de recursos | Não comprovado |
-| ❌ | Impedir cliente A de acessar recurso privado de cliente B | Testar em recurso existente na S01; pedidos são da S04 |
-| ❌ | Ampliar testes de acesso por HTTP direto a operações novas | Prova atual apenas nas rotas de papéis |
-| ❌ | **Decidir privacidade/retenção da demonstração (PEN-13)** | Decisão pendente |
+| Status | Funcionalidade                                               | Evidência ou pendência                                                                      |
+| ------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| ✅     | Restringir GET `/admin/roles`                                | `auth`, `verified`, `can:roles.manage` e testes                                             |
+| ✅     | Restringir POST `/admin/roles`                               | `auth`, `verified`, `can:roles.manage` e testes                                             |
+| ✅     | Negar cadastro a visitante ou usuário sem permissão          | `RoleManagementTest`                                                                        |
+| ⏳     | Restringir PATCH `/admin/roles/{role}`                       | `auth`, `verified`, `can:roles.manage`; testes locais de permissão e autenticação aprovados |
+| ⏳     | Impedir alterações inválidas ou de papel inexistente         | `UpdateRoleRequest`; testes locais de validação e resposta 404 aprovados                    |
+| ❌     | Definir login interno, 2FA e sessões (PEN-15)                | Decisão e implementação pendentes                                                           |
+| ❌     | Exigir 2FA para operações administrativas                    | Suporte técnico do Fortify não equivale a exigência                                         |
+| ❌     | Invalidar ou negar operação de funcionário desativado        | Não comprovado                                                                              |
+| ❌     | Implementar Policies para titularidade de recursos           | Não comprovado                                                                              |
+| ❌     | Impedir cliente A de acessar recurso privado de cliente B    | Comprovar em recursos existentes; pedidos pertencem à S04                                   |
+| ❌     | Ampliar os testes de acesso HTTP direto às futuras operações | Evidência atual restrita às rotas de papéis                                                 |
+| ❌     | Decidir privacidade/retenção da demonstração (PEN-13)        | Pendente                                                                                    |
 
 ## 6. Testes, CI e acompanhamento
 
-| Status | Entrega ou verificação |
-|---|---|
-| ✅ | `composer qa` local: 70 testes e 218 asserções aprovados em 01/11/2026 |
-| ✅ | PHPStan 0 erros, TypeScript, lint e build local aprovados |
-| ✅ | `RoleManagementTest`: 8 testes, 22 asserções |
-| ✅ | Testes de autorização permitida e negada para listagem e cadastro de papéis |
-| ✅ | Teste no navegador: cadastro válido, slug repetido e slug inválido |
-| ✅ | Commits `c2778f6` e `54b6bf5` publicados no GitHub |
-| ✅ | Hook `pre-commit` gerou histórico diário durante os dois commits locais |
-| ❌ | Conferir resultado final do GitHub Actions para `54b6bf5` |
-| ❌ | Testes de funcionário desativado e sessão antiga |
-| ❌ | Testes de 2FA obrigatório para internos |
-| ❌ | Testes de tentativa de acesso a recursos de outro cliente |
-| ❌ | Verificar critérios AC-001 a AC-006 aplicáveis à S01, separando AC dependentes da S04 |
-| ❌ | Auditoria final dos requisitos da S01 e gate para S02 |
+| Status | Entrega ou verificação                                                                                                      |
+| ------ | --------------------------------------------------------------------------------------------------------------------------- |
+| ✅     | `composer qa` local em 01/11/2026: **85 testes, 262 asserções**, sem falhas                                                 |
+| ✅     | `RoleManagementTest`: **23 testes, 66 asserções**, incluindo os cenários de edição                                          |
+| ✅     | PHPStan/Larastan: **0 erros**; TypeScript, lint e build aprovados localmente                                                |
+| ✅     | Formatação local aprovada; `composer qa` corrigiu automaticamente um detalhe de estilo em `RoleManagementTest.php`          |
+| ✅     | Navegador: abrir edição preenchida, alterar e salvar nome, persistência após F5                                             |
+| ✅     | Navegador: tentar slug duplicado, exibir erro e preservar dados após F5                                                     |
+| ✅     | Cadastro de papéis do passo 15 publicado anteriormente na `main`                                                            |
+| ❌     | **CI do commit `ebbd1df` aprovado:** não; falhou pela formatação de `05-acompanhamento-etapas.md`, antes da etapa de testes |
+| ⏳     | **Corrigir o CI de formatação no remoto:** `composer qa` local reformatou o documento; publicar e conferir nova execução    |
+| ⏳     | **Publicar o passo 16:** revisar diff, incluir `UpdateRoleRequest.php`, fazer commit/push e validar CI remoto               |
+| ❌     | Traduzir a mensagem de validação exibida em inglês (melhoria de interface; não bloqueou a validação funcional)              |
+| ❌     | Testes de funcionário desativado e sessão antiga: pendentes                                                                 |
+| ❌     | Testes de 2FA obrigatório para equipe interna: pendentes                                                                    |
+| ❌     | Testes de tentativa de acesso a recursos de outro cliente: pendentes                                                        |
+| ❌     | Verificar critérios AC-001 a AC-006 aplicáveis à S01, distinguindo dependências da S04: pendente                            |
+| ❌     | Auditoria final dos requisitos da S01 e gate para S02: pendente                                                             |
+
+**Referência do último CI remoto:** https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/41278242215
 
 ## 7. Itens de Minha Conta adiados: não bloqueiam S01
 
-| Funcionalidade | Etapa responsável |
-|---|---|
-| Visualizar meus pedidos | S04 |
-| Visualizar minhas propostas | S07 |
-| Consultar solicitações de pós-venda | S08 |
-| Visualizar favoritos | S09 |
-| Indicadores operacionais completos | S13 |
+| Funcionalidade                      | Etapa responsável |
+| ----------------------------------- | ----------------- |
+| Visualizar meus pedidos             | S04               |
+| Visualizar minhas propostas         | S07               |
+| Consultar solicitações de pós-venda | S08               |
+| Visualizar favoritos                | S09               |
+| Indicadores operacionais completos  | S13               |
 
 ## 8. Ordem de implementação sugerida
 
-1. **Passo 16:** edição de papéis (TDD, backend, formulário, testes no navegador).
-2. Resolver **PEN-10**; preparar gestão apropriada de permissões.
-3. Associar/remover permissões de papéis pelo painel.
-4. CRUD administrativo de funcionários, atribuição de papéis e prevenção de ausência de administrador.
-5. Painel administrativo separado, com acesso restrito.
-6. Resolver **PEN-15** e obrigar 2FA interno; gerir sessões e usuários desativados.
-7. CRUD de endereços, endereço padrão e sessões na área do cliente.
-8. Policies, autorização por titularidade, auditoria e **PEN-13**.
-9. Testes de ponta a ponta da S01, CI, documentação e fechamento do gate.
+1. **Fechar a publicação do passo 16:** revisar diff e arquivo novo; atualizar este checkpoint; executar commit/push autorizado; verificar CI remoto e corrigir falhas, se houver.
+2. **Formalizar PEN-10:** registrar/alinhar a decisão sobre catálogo de permissões e preparar gestão adequada.
+3. Implementar atribuição/remoção de permissões dos papéis pelo painel.
+4. Implementar gestão administrativa de funcionários, atribuição de papéis e proteção do último administrador ativo.
+5. Construir painel administrativo separado com acesso restrito.
+6. Resolver PEN-15 e exigir 2FA para equipe; gerenciar sessões e bloqueio de usuários desativados.
+7. Implementar CRUD de endereços, endereço padrão e gestão de sessões na área do cliente.
+8. Implementar Policies, autorização por titularidade, auditoria e concluir PEN-13.
+9. Executar validações de ponta a ponta da S01, CI, documentação e gate antes de iniciar S02.
 
 ## 9. Critérios para declarar S01 concluída
 
 - [ ] Cadastro, login, recuperação, verificação, perfil e endereços essenciais validados.
 - [ ] Gestão de papéis, permissões e funcionários implementada conforme escopo aprovado.
-- [ ] Rotas administrativas segregadas e protegidas por permissão.
+- [ ] Rotas administrativas segregadas e protegidas por permissões apropriadas.
 - [ ] Política de autenticação interna e 2FA obrigatório demonstrada.
 - [ ] Usuários desativados bloqueados, incluindo sessões antigas.
 - [ ] Policies/autorização por titularidade testadas em requisições HTTP diretas.
 - [ ] Auditoria relevante e decisões PEN-10, PEN-15 e PEN-13 registradas.
-- [ ] Testes locais, CI remoto, navegador e critérios de aceite com evidência.
-- [ ] Documentação e checkpoint atualizados; liberar S02.
+- [ ] Testes locais, CI remoto, navegador e critérios de aceite com evidências.
+- [ ] Documentação e checkpoint atualizados; gate S01 aprovado para liberar S02.
 
-## 10. REGRAS PARA TODAS AS PRÓXIMAS SESSÕES
+**Observação:** a implementação local do passo 16 não significa que a S01 inteira está concluída.
+
+## 10. Regras para todas as próximas sessões
 
 **Este arquivo é o checkpoint de acompanhamento da S01.** Ao iniciar uma sessão, ler este documento antes de decidir a próxima tarefa.
 
 1. Verificar a versão atual do GitHub, `git status -sb` e o código antes de confiar em status antigos.
-2. Fazer uma funcionalidade por vez. Evitar marcar uma funcionalidade como feita apenas porque já existe tabela, esqueleto ou teste incompleto.
-3. **Atualizar este arquivo ao finalizar cada fatia**, no mesmo ciclo de commit e push da funcionalidade. Ajustar os status, a última entrega, os testes reais, o hash do commit e o próximo passo.
-4. Não inventar resultados, percentuais, CI verde, decisões ou funcionalidades não comprovadas. Para requisitos definidos em etapas futuras, registrar o adiamento explicitamente.
-5. O hook atual em `.githooks/pre-commit` **atualiza automaticamente apenas** `docs/09-historico/*.txt`. **Ele não modifica este plano**. Sua atualização precisa ser feita na sessão de desenvolvimento ou por uma automação específica.
-6. Havendo discordância entre documento e execução, prevalecem o código e as evidências recentes; corrigir o plano imediatamente.
-7. Ao encerrar a sessão, deixar claro: **feito / pendente / decisão bloqueante / próxima ação / commit / testes / situação do CI**.
+2. Fazer uma funcionalidade por vez; não marcar uma entrega como concluída apenas porque existe tabela, esqueleto ou teste incompleto.
+3. **Atualizar este arquivo ao finalizar cada fatia**, no mesmo ciclo de commit e push da funcionalidade. Registrar status, evidências, testes reais, hash do commit e próximo passo.
+4. Não inventar resultados, percentuais, CI aprovado, decisões ou funcionalidades não comprovadas. Distinguir explicitamente o que está apenas local do que foi publicado.
+5. O hook em `.githooks/pre-commit` **atualiza somente** `docs/09-historico/*.txt`; **não atualiza este plano automaticamente**.
+6. Havendo discordância entre documentos e execução, prevalecem o código e as evidências recentes; revisar o acompanhamento.
+7. Encerrar a sessão informando: **feito / pendente / decisão bloqueante / próxima ação / commit / testes / situação do CI**.
+8. Após publicar, atualizar o SHA de referência e o resultado exato do CI remoto; nunca antecipar a aprovação.
 
-**Referências:** `docs/05-implementacao/01-roadmap-vertical.md`, `docs/02-requisitos/01-rf-consolidados.md`, `docs/02-requisitos/04-criterios-aceite.md`, `docs/04-arquitetura/04-seguranca-e-autorizacao.md`. Alguns desses arquivos podem existir apenas no ambiente local e não devem ser presumidos publicados no GitHub.
+**Referências documentais:** `docs/05-implementacao/01-roadmap-vertical.md`, `docs/02-requisitos/01-rf-consolidados.md`, `docs/02-requisitos/04-criterios-aceite.md` e `docs/04-arquitetura/04-seguranca-e-autorizacao.md`. Alguns desses documentos podem existir somente no ambiente local e não devem ser presumidos publicados no GitHub.
