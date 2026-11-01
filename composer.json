@@ -42,6 +42,15 @@
         }
     },
     "scripts": {
+        "qa:fix": [
+            "npm run check -- --fix",
+            "@lint"
+        ],
+        "qa": [
+            "@qa:fix",
+            "@ci:check",
+            "npm run build"
+        ],
         "setup": [
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
