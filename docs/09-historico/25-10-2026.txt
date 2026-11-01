@@ -1,0 +1,82 @@
+HISTÓRICO DE DESENVOLVIMENTO
+Data: 25/10/2026
+Projeto: E-commerce de Equipamentos Eletrônicos
+Tipo: PLANO DE CONTINUIDADE — sem implementação nova comprovada neste dia
+
+========================================
+1. CONFIGURAÇÃO INICIAL
+========================================
+
+- Retomado o estado confirmado da S01.
+- Nenhuma reinstalação comprovada.
+
+Resultado: base anterior mantida.
+
+========================================
+2. BANCO DE DADOS
+========================================
+
+- Nenhuma alteração adicional de schema comprovada neste dia.
+- Permaneceram válidas as estruturas users, roles, permissions e pivots criadas antes.
+
+========================================
+3. AUTENTICAÇÃO
+========================================
+
+- Reafirmado que associação entre papéis e permissões não equivale a autorização efetiva.
+- Planejada a próxima implementação de autorização por Gate/Policy no backend.
+
+Resultado: planejamento, não implementação nova.
+
+========================================
+4. FRONTEND
+========================================
+
+- Nenhuma nova tela comprovada.
+
+========================================
+5. TESTES E QUALIDADE
+========================================
+
+- Referência herdada da noite de 24/10: 48 testes e 152 asserções aprovadas.
+- Nenhuma nova execução de testes identificada especificamente para 25/10 no histórico disponível.
+
+========================================
+6. GIT E GITHUB
+========================================
+
+- Nenhum novo commit identificado no dia 25/10, horário de Brasília.
+- O commit a1008d2 aparece com data UTC 25/10, mas corresponde à noite de 24/10 no Brasil.
+- Último CI conhecido: aprovado para a1008d2.
+
+========================================
+7. ORGANIZAÇÃO DO PROJETO
+========================================
+
+- Criado/preservado plano de continuidade para o próximo chat.
+- Definida ordem de leitura de histórico, roadmap, matriz de acesso, requisitos e segurança.
+- Confirmada metodologia: usuário programa; IA orienta; sem código pronto por padrão.
+
+========================================
+8. PENDÊNCIAS
+========================================
+
+- PEN-10: catálogo de permissões ainda sem decisão no registro deste dia.
+- Autorização real ainda pendente.
+- PEN-15: autenticação interna, 2FA e sessões.
+- Demais entregas e testes da S01.
+
+========================================
+9. PRÓXIMO PASSO
+========================================
+
+Ler os requisitos pertinentes e resolver PEN-10. Escolher menor entrega verificável, orientar implementação, revisar e testar antes de versionar.
+
+========================================
+10. ESTADO AO ENCERRAR O DIA
+========================================
+
+Nenhuma nova implementação comprovada para 25/10.
+Estado herdado: permissões e papéis relacionados, mas sem autorização aplicada.
+Último commit validado disponível: a1008d2.
+OBS: registro de continuidade; não confundir planos com tarefas realizadas.

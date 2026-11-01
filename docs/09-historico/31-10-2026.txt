@@ -1,0 +1,213 @@
+HISTÓRICO DE DESENVOLVIMENTO
+Data de referência: 31/10/2026, horário de Brasília
+Projeto: E-commerce de Equipamentos Eletrônicos
+Observação: commits realizados na noite de 31/10 aparecem com data 01/11 em UTC.
+
+========================================
+1. CONFIGURAÇÃO INICIAL
+========================================
+
+- Continuação da S01: identidade, contas e permissões (RBAC).
+- Stack mantida: Laravel 13, React/Inertia, PostgreSQL, Pest, TypeScript, PHPStan/Larastan e Pint.
+- Reaproveitado o trabalho do último checkpoint, commit 341ab83, sem reinstalar a aplicação.
+- Aprendizado guiado: usuário implementa; IA orienta, revisa e explica quando solicitado.
+
+Resultado: S01 continuou; S02 não foi iniciada.
+
+========================================
+2. FRONTEND — PASSO 14
+========================================
+
+- Concluído o arquivo resources/js/pages/admin/roles.tsx.
+- Definidos os tipos Role (id, name, slug) e RolesProps (roles: Role[]).
+- A função Roles passou a receber os dados enviados pelo Inertia.
+- Os papéis passaram a ser exibidos com map(), usando id como key.
+- A página mostra "Nenhum papel cadastrado" quando não há registros.
+- Mantido Head com título "Gestão de papéis".
+- Teste visual comprovado por captura de tela: "Administrador (admin)" apareceu no painel.
+- O layout usado ainda é o do starter kit. A interface administrativa definitiva está pendente.
+
+Resultado: listagem React funcional e demonstrada no navegador.
+
+========================================
+3. POSTGRESQL — INCONSISTÊNCIA E CORREÇÃO LOCAL
+========================================
+
+- A migration create_permissions_table havia sido executada (status Ran), mas o PostgreSQL
+  local não possuía a coluna description na tabela permissions.
+- O código versionado da migration já previa description varchar(255) não nula.
+- Antes da correção, Permission::count() retornou 0.
+- Executado no banco LOCAL: ALTER TABLE permissions ADD COLUMN description VARCHAR(255) NOT NULL.
+- Confirmadas as cinco colunas com Schema::getColumnListing e php artisan db:table permissions.
+- Confirmadas a chave primária id e a unicidade de slug.
+- Cadastrada a permissão roles.manage, ligada ao papel admin e ao usuário de desenvolvimento.
+- User::hasPermission('roles.manage') retornou true.
+- Não foi usado migrate:fresh; os usuários e papéis existentes foram preservados.
+- A CAUSA original da diferença entre migration e banco continua NÃO COMPROVADA.
+- Não foi criada uma migration corretiva para um problema ainda não reproduzido em instalação limpa.
+
+Resultado: esquema local alinhado ao código; causa histórica ainda não identificada.
+
+========================================
+4. TESTES DE ESQUEMA
+========================================
+
+- Criado tests/Feature/Database/PermissionSchemaTest.php.
+- Teste 1: verifica a existência das colunas id, slug, description, created_at e updated_at.
+- Teste 2: verifica que description não aceita NULL.
+- Resultado do arquivo: 2 testes aprovados; 3 asserções.
+- A unicidade do slug já tinha cobertura em RolePermissionsTest.php.
+- Testes locais usam SQLite em memória por padrão; o CI remoto usa PostgreSQL 17.
+
+Resultado: teste de esquema criado, versionado e aprovado no CI remoto.
+
+========================================
+5. QUALIDADE E AUTOMAÇÃO
+========================================
+
+- Adicionados scripts qa:fix e qa no composer.json.
+- qa:fix aplica formatação automática do frontend e Pint.
+- qa executa a correção de formato, ci:check e build de produção.
+- Mantido composer ci:check como verificação sem autocorreção.
+- composer validate --no-check-publish: aprovado.
+- composer qa: aprovado.
+- Checkpoint de qualidade publicado: 62 testes aprovados, 196 asserções.
+- TypeScript, lint, Pint, PHPStan/Larastan e build de frontend: aprovados.
+- Aviso opcional de fonte fontaine não bloqueou a execução.
+
+Resultado: comando local de QA implementado e funcional.
+
+========================================
+6. GIT, COMMITS E CI REMOTO
+========================================
+
+Commits publicados na branch main, na noite de 31/10 em Brasília:
+837abb3 - feat(auth): exibir papéis na interface React
+92349e5 - test(db): validar estrutura da tabela de permissões
+2c23383 - chore(qa): automatizar formatação e verificações
+
+- Push origin main confirmado: 341ab83..2c23383.
+- git status -sb informado logo após o push: main...origin/main, sem alterações pendentes.
+- GitHub Actions do commit 2c23383: concluído com SUCCESS.
+- Evidência: https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/41257181730
+- Os timestamps remotos de 01/11 são UTC; a sessão corresponde a 31/10 em Brasília.
+
+Resultado: Passo 14, teste de esquema e comando qa publicados; CI remoto aprovado.
+
+========================================
+7. ARQUITETURA E DECISÕES
+========================================
+
+- Arquitetura recomendada: monólito modular pragmático, aproveitando Laravel nativo.
+- Controllers enxutos; Form Requests para validação; Gates/Policies para autorização.
+- Actions e Services apenas quando a operação exigir, sem Service ou Repository para todo CRUD.
+- RBAC próprio com Models, pivôs, hasPermission, Gate e middleware can:roles.manage.
+- Decisão PEN-10: catálogo de permissões controlado em código; administrador atribui
+  permissões aos papéis, sem cadastrá-las livremente pelo painel.
+- ADR formal e atualização de parte da documentação original ainda pendentes.
+
+========================================
+8. PASSO 15 — CADASTRO DE PAPÉIS (INICIADO)
+========================================
+
+- Próxima funcionalidade: RF-13-006, cadastro de papéis de acesso.
+- Criado localmente tests/Feature/Admin/RoleManagementTest.php.
+- Escrito conjunto de 7 testes: cadastro permitido; 403 sem permissão;
+  403 sem papel; redirecionamento de visitante; nome obrigatório;
+  slug obrigatório; slug duplicado.
+- Execução dos 7 testes: 7 FALHAS, por ausência da rota POST /admin/roles
+  (405) e da validação. Falhas ESPERADAS na fase vermelha do TDD.
+- Criado localmente app/Http/Requests/Admin/StoreRoleRequest.php.
+- Foram discutidas as regras: name obrigatório/string/max 255;
+  slug obrigatório/string/max 255/formato padronizado/único na tabela roles.
+- authorize() retorna true; a autorização efetiva deverá estar nos middlewares
+  auth, verified e can:roles.manage da rota POST.
+- php -l do Form Request: "No syntax errors detected".
+- NÃO há evidência de teste funcional aprovado do Request.
+- RoleController@store e rota POST ainda NÃO estão implementados.
+- Formulário React de cadastro ainda NÃO foi implementado.
+
+Resultado: Passo 15 em TDD vermelho. NÃO considerar o cadastro concluído.
+
+========================================
+9. ARQUIVOS LOCAIS NÃO PUBLICADOS
+========================================
+
+Depois do commit 2c23383 foram trabalhados:
+- tests/Feature/Admin/RoleManagementTest.php
+- app/Http/Requests/Admin/StoreRoleRequest.php
+
+Não foi fornecido git status ao término desses trabalhos.
+Não presumir que os arquivos estejam versionados, staged, completos ou iguais
+ao conteúdo discutido. Conferir o estado local antes de continuar.
+Não executar ações destrutivas nem descartar trabalho não commitado.
+
+========================================
+10. PENDÊNCIAS DA S01
+========================================
+
+- Finalizar cadastro e edição de papéis.
+- Catálogo de permissões controlado e atribuição pelos administradores.
+- Gestão de usuários internos, papéis e bloqueio do último administrador.
+- Painel administrativo separado da conta do cliente.
+- 2FA obrigatório para equipe e proteção das operações administrativas.
+- Endereços, sessões, solicitações de exclusão/anonimização e auditoria de ações.
+- Policies e testes de acesso negado inclusive por HTTP direto.
+- Formalizar arquitetura, atualizar PEN-10 e homologar os critérios de aceite.
+- Documentar a inconsistência histórica do PostgreSQL; a causa não foi provada.
+
+S01 continua EM ANDAMENTO. Não calcular porcentagem de conclusão sem evidências.
+
+========================================
+11. PONTO EXATO DE PARADA
+========================================
+
+Último passo concluído: PASSO 14, listagem de papéis no React.
+Passo atual: PASSO 15, cadastro de papéis (RF-13-006).
+Último commit PUBLICADO: 2c23383.
+CI remoto do commit: SUCCESS.
+Último checkpoint com suite aprovada: 62 testes, 196 asserções.
+Novos testes de cadastro depois desse checkpoint: 7 falhas ESPERADAS de TDD.
+Última ação local informada: php -l de StoreRoleRequest.php aprovado.
+Rota POST e RoleController@store pendentes.
+
+========================================
+12. INSTRUÇÕES PARA A PRÓXIMA CONVERSA
+========================================
+
+1. Conferir git status -sb e git log -1 --oneline no computador local.
+2. Ler o teste local tests/Feature/Admin/RoleManagementTest.php e
+   o Request local app/Http/Requests/Admin/StoreRoleRequest.php.
+3. Revisar as regras do Request e confirmar que a proteção da rota será
+   auth + verified + can:roles.manage.
+4. Criar RoleController@store recebendo StoreRoleRequest, utilizando dados
+   validados e redirecionando para admin.roles.index.
+5. Criar a rota POST /admin/roles apontando para store, mantendo proteção RBAC.
+6. Reexecutar 7 testes de RoleManagementTest até todos passarem;
+   adicionar testes de slug inválido e limites, se aplicável.
+7. Construir formulário React de cadastro, tratamento de erros e feedback;
+   validar no navegador, inclusive com usuário não autorizado.
+8. Rodar composer qa, inspecionar git diff e validar arquivos antes do commit.
+9. Publicar o código somente após aprovação/autorização do usuário.
+10. Atualizar este histórico e o acompanhamento do roadmap; depois continuar S01.
+
+INSTRUÇÕES DE TRABALHO
+- Uma tarefa de cada vez ou etapas numeradas curtas; evitar texto longo.
+- Usuário implementa; IA revisa e ensina sem fornecer código pronto,
+  salvo quando solicitado.
+- Não refazer o Passo 14, nem afirmar que os 7 testes já passaram.
+- Não inventar resultados, porcentagens ou status do Git local.
+- Seguir Conventional Commits em português brasileiro.
+- Não iniciar S02 enquanto o gate da S01 não for atingido.
+
+========================================
+13. ESTADO FINAL DA SESSÃO
+========================================
+
+S00: base técnica preparada; gate formal de instalação a revisar.
+S01: EM ANDAMENTO.
+Passo 14: CONCLUÍDO E PUBLICADO.
+Passo 15: INICIADO, NÃO IMPLEMENTADO.
+Código do cadastro: LOCAL/ESTADO NÃO CONFERIDO NO GIT.
+CI remoto publicado: APROVADO.
+Próxima tarefa: RoleController@store + POST /admin/roles e testes.

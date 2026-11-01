@@ -1,0 +1,10 @@
+#!/bin/sh
+# Historico automatico: apenas dados verificaveis do que esta no stage.
+# A documentacao de retomada e revisada separadamente.
+
+if ! command -v php >/dev/null 2>&1; then
+    echo "[historico] PHP nao encontrado no PATH. O commit foi interrompido." >&2
+    exit 1
+fi
+
+php scripts/git/atualizar-historico.php

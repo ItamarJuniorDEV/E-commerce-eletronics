@@ -42,5 +42,12 @@ yarn-error.log
 /boost.json
 /opencode.json
 /opencode.jsonc
-/docs
+# Documentacao permitida: historicos diarios e plano de acompanhamento
+/docs/*
+!/docs/09-historico/
+/docs/09-historico/*
+!/docs/09-historico/*.txt
+!/docs/05-implementacao/
+/docs/05-implementacao/*
+!/docs/05-implementacao/05-acompanhamento-etapas.md
 .claude

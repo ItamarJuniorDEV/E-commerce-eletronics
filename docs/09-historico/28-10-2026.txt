@@ -1,0 +1,196 @@
+HISTÓRICO DE DESENVOLVIMENTO
+Data de referência: 28/10/2026
+Projeto: E-commerce de Equipamentos Eletrônicos
+Observação: sessão de 28/10 continuada após a meia-noite de 29/10 (horário de Brasília).
+
+========================================
+1. CONFIGURAÇÃO INICIAL
+========================================
+
+- Retomada a etapa S01 — identidade, contas e permissões (RBAC).
+- Confirmada a branch main sincronizada com origin/main, inicialmente no commit df59f3f.
+- Mantida a base Laravel 13 + React/Inertia + PostgreSQL, sem reinstalação.
+- Desenvolvimento guiado: desenvolvedor implementa; IA orienta, explica e revisa.
+
+Resultado: ambiente existente reutilizado, com continuidade do trabalho anterior.
+
+========================================
+2. BANCO DE DADOS
+========================================
+
+- Reaproveitadas as tabelas users, roles, permissions, role_user e permission_role.
+- Nenhuma nova migration criada nesta entrega.
+- Consulta de listagem de papéis implementada com Eloquent Query Builder:
+  seleciona id, name e slug; ordena pelo campo name; executa com get().
+- Nenhuma consulta de usuários associados aos papéis foi adicionada à listagem.
+
+Resultado: listagem de papéis preparada sem mudança no esquema do banco.
+
+========================================
+3. BACKEND E AUTORIZAÇÃO
+========================================
+
+- Mantidos os middlewares auth, verified e can:roles.manage na rota GET /admin/roles.
+- Rota provisória com resposta JSON substituída inicialmente por Route::inertia().
+- Criado app/Http/Controllers/Admin/RoleController.php.
+- Implementado index(): Response usando Role::query() e Inertia::render('admin/roles', ['roles' => $roles]).
+- Rota conectada a [RoleController::class, 'index'], com nome admin.roles.index preservado.
+- Confirmado que get() retorna coleção vazia quando não há registros; não foi adicionado try/catch desnecessário à listagem.
+- A autorização por Gate roles.manage, implementada anteriormente, permaneceu em uso.
+
+Resultado: backend consulta papéis e os entrega à página Inertia; acesso continua protegido.
+
+========================================
+4. FRONTEND
+========================================
+
+- Criado resources/js/pages/admin/roles.tsx.
+- Página inicial contém o componente Roles, com Head e o título "Gestão de papéis".
+- Build corrigiu o erro anterior de arquivo ausente no manifesto do Vite.
+- Ainda NÃO foram implementados recebimento tipado da prop roles, renderização da lista, estado vazio ou layout administrativo definitivo.
+- Não foi registrada validação visual da listagem pelo navegador.
+
+Resultado: componente da página existe e compila, mas ainda não exibe os dados consultados.
+
+========================================
+5. TESTES E QUALIDADE
+========================================
+
+- Atualizado tests/Feature/RoleAccessTest.php para validar resposta Inertia em vez de JSON.
+- Mantidos os testes de acesso negado a usuário sem permissão, usuário sem papel e visitante.
+- Adicionadas verificações do componente admin/roles, da quantidade de itens e dos campos id, name e slug.
+- Adicionado teste que cadastra Vendedor antes de Administrador e confirma a ordenação alfabética na resposta.
+- Teste específico: 5 testes aprovados, 34 asserções.
+- Validação local final por composer ci:check: 60 testes aprovados, 193 asserções.
+- Frontend: 71 arquivos com formatação correta e lint sem avisos/erros em 65 arquivos.
+- TypeScript: tsc --noEmit aprovado.
+- Pint: 67 arquivos aprovados após correção de whitespace e ordem dos imports.
+- PHPStan/Larastan: 46/46 arquivos analisados, nenhum erro.
+- npm run build: aprovado (2.314 módulos transformados).
+- git diff --cached --check: sem problemas.
+- Aviso opcional sobre pacote fontaine no build; não bloqueou a compilação.
+- CI remoto no GitHub Actions para 341ab83: concluído com sucesso.
+  https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/40829552377
+
+Resultado: validações locais e pipeline remoto aprovados para a entrega; exibição visual da lista ainda não validada.
+
+========================================
+6. GIT E GITHUB
+========================================
+
+Commit publicado:
+341ab83 - feat(auth): preparar listagem de papéis com Inertia
+
+Arquivos do commit:
+- app/Http/Controllers/Admin/RoleController.php (novo)
+- resources/js/pages/admin/roles.tsx (novo)
+- routes/web.php (alterado)
+- tests/Feature/RoleAccessTest.php (alterado)
+
+- Alteração registrada: 4 arquivos, 85 inserções e 9 exclusões.
+- git push origin main concluído, com atualização df59f3f..341ab83.
+- git status -sb final: main...origin/main, sem alterações locais pendentes.
+- git log -1 --oneline final: 341ab83 (HEAD -> main, origin/main).
+- Mensagem segue a convenção do projeto: Conventional Commits, tipo feat, escopo auth e descrição em português.
+- Histórico deste dia não foi incluído no commit 341ab83; documento preparado separadamente.
+
+Resultado: código publicado e repositório local sincronizado com a main remota.
+
+========================================
+7. ARQUITETURA E DECISÕES
+========================================
+
+- Foi recomendada a arquitetura de monólito modular pragmático, alinhada ao Laravel:
+  Controllers enxutos; Form Requests para validação; Gates/Policies para autorização;
+  Actions para casos de uso complexos; Services para regras compartilhadas quando necessários;
+  Eloquent como acesso a dados principal.
+- Para a listagem simples de papéis, decidiu-se não criar Service ou Repository genérico.
+- A arquitetura foi discutida como recomendação, mas ainda NÃO formalizada em ADR aprovada.
+- TDD adotado pragmaticamente nas regras e comportamentos críticos; não imposto a cada detalhe visual.
+- Permanece a decisão PEN-10 do dia 26/10: catálogo controlado de permissões no código;
+  administradores atribuem permissões a papéis, sem criação livre de permissões no painel.
+- A atualização correspondente de toda a documentação local não foi comprovada.
+
+========================================
+8. PENDÊNCIAS DA ENTREGA ATUAL
+========================================
+
+- Frontend roles.tsx ainda não recebe a propriedade roles de maneira tipada.
+- Ainda não exibe nome/slug dos papéis com map() nem usa id como key.
+- Ainda não apresenta uma mensagem de lista vazia.
+- Não há comprovação visual da listagem real no navegador.
+- Nenhum formulário de criação, edição ou atribuição de permissões foi implementado nesta entrega.
+- Ainda não foi formalizada a ADR da arquitetura.
+- Atualizar documentação de PEN-10 e a matriz de andamento de S01 continua pendente.
+
+========================================
+9. O QUE AINDA FALTA NA S01
+========================================
+
+- Concluir a tela administrativa de listagem de papéis.
+- Implementar, conforme os requisitos da S01, gestão de papéis e atribuição de permissões.
+- Implementar catálogo controlado de permissões conforme PEN-10.
+- Avançar em gestão de usuários internos, separação entre contas internas e clientes,
+  políticas de titularidade, segurança/2FA interno, sessões, endereços e demais critérios da S01.
+- Testar comportamentos autorizados, proibidos, dados inválidos e fluxos completos conforme cada nova funcionalidade.
+- Revisar o checklist oficial da documentação S01 antes de declarar a etapa concluída.
+
+IMPORTANTE: S01 permanece EM ANDAMENTO. Nenhuma porcentagem de conclusão foi calculada ou validada.
+
+========================================
+10. PONTO EXATO DE PARADA
+========================================
+
+Último passo concluído: PASSO 13 — teste da consulta e ordenação alfabética de papéis.
+Último commit: 341ab83.
+Último estado Git confirmado: main sincronizada com origin/main e diretório limpo.
+Última validação local: 60 testes e 193 asserções aprovados; build aprovado.
+Última validação remota: CI GitHub Actions aprovado para 341ab83.
+
+O backend está pronto para enviar a prop roles ao Inertia.
+O arquivo resources/js/pages/admin/roles.tsx existe, mas ainda mostra apenas o título.
+
+========================================
+11. COMO CONTINUAR NA PRÓXIMA SESSÃO
+========================================
+
+PASSO 14 — EXIBIR OS PAPÉIS NO REACT (PRIMEIRA PRIORIDADE)
+
+1. Abrir o projeto e conferir git status -sb e git log -1 --oneline; esperar main e 341ab83, salvo mudanças posteriores.
+2. Abrir resources/js/pages/admin/roles.tsx.
+3. Definir o tipo de cada papel: id (number), name (string), slug (string).
+4. Fazer o componente Roles receber a propriedade roles como lista tipada.
+5. Exibir cada papel usando map(), com id como key.
+6. Mostrar name e slug, preservando o título Head.
+7. Prever mensagem "Nenhum papel cadastrado" para lista vazia.
+8. Validar formatação, lint, TypeScript e build.
+9. Validar pelo navegador com usuário que possua roles.manage; conferir dados reais e acesso negado, sem presumir que os dados dos testes existam no banco de desenvolvimento.
+10. Executar testes pertinentes e composer ci:check; revisar o diff; só então preparar commit/push de nova entrega, se autorizado.
+
+DEPOIS DO PASSO 14
+
+- Conferir requisitos e critérios de aceite da gestão administrativa na documentação.
+- Planejar próximos testes e casos de uso para criação/edição de papéis e atribuição de permissões.
+- Formalizar a decisão arquitetural em ADR e alinhar PEN-10/documentação, mediante revisão.
+- Prosseguir com os demais requisitos da S01 antes de iniciar a S02 (catálogo).
+
+FORMA DE TRABALHO COMBINADA
+
+- Guiar em passos numerados, objetivos e curtos.
+- Não fornecer código pronto, exceto quando solicitado.
+- Desenvolvedor implementa; IA revisa e explica pontos necessários.
+- Validar antes de commitar; seguir Conventional Commits em PT-BR.
+- Não modificar o repositório ou publicar alterações sem solicitação expressa.
+
+========================================
+12. ESTADO AO ENCERRAR O DIA
+========================================
+
+S01: EM ANDAMENTO.
+Backend da listagem: IMPLEMENTADO E TESTADO.
+Proteção da rota: MANTIDA E TESTADA.
+Frontend da listagem: INICIADO, NÃO CONCLUÍDO.
+Build e testes locais: APROVADOS.
+CI remoto: APROVADO.
+Commit 341ab83: PUBLICADO.
+Próximo ponto de trabalho: PASSO 14, exibir os papéis na tela React.
