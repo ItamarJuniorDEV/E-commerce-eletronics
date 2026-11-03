@@ -1,0 +1,73 @@
+HISTÓRICO DE DESENVOLVIMENTO
+Data: 02/11/2026 (America/Sao_Paulo)
+Projeto: E-commerce de Equipamentos Eletrônicos
+
+========================================
+1. CONFIGURAÇÃO E CONTEXTO
+========================================
+
+- Sessão: registrar manualmente, se necessário.
+- Etapa Sxx atual: conferir no plano de implementação.
+
+========================================
+2. ALTERAÇÕES DOS COMMITS (AUTOMÁTICO)
+========================================
+
+<!-- AUTO-HISTORICO-INICIO -->
+
+Registro 02/11/2026 21:50:14 BRT [1239f66746fdd92a]
+Arquivos preparados no stage (4):
+  - Configuracao/outros: AGENTS.md
+  - Configuracao/outros: CLAUDE.md
+  - Documentacao: docs/05-implementacao/05-acompanhamento-etapas.md
+  - Documentacao: docs/05-implementacao/06-metodologia-implementacao-guiada.md
+Validações: não inferidas pelo hook; conferir logs do composer qa/CI.
+Commit/SHA: não disponível antes da criação; consultar git log.
+<!-- AUTO-HISTORICO-FIM -->
+
+========================================
+3. BANCO DE DADOS
+========================================
+
+- Registrar mudanças e migrations somente quando verificadas.
+
+========================================
+4. BACKEND E AUTORIZAÇÃO
+========================================
+
+- Registrar comportamentos realmente implementados e testados.
+
+========================================
+5. FRONTEND
+========================================
+
+- Registrar telas e fluxos realmente demonstrados.
+
+========================================
+6. TESTES E QUALIDADE
+========================================
+
+- O hook não executa testes: anexar resultado real do composer qa / CI.
+
+========================================
+7. GIT E PUBLICAÇÃO
+========================================
+
+- Este histórico registra arquivos PREPARADOS para commit; consulte git log para o hash final.
+- Push não é realizado pelo hook; só registrar após confirmação.
+
+========================================
+8. DECISÕES E PENDÊNCIAS
+========================================
+
+- Preencher a partir das decisões verificadas no desenvolvimento.
+
+========================================
+9. PRÓXIMO PASSO / PONTO DE RETOMADA (REVISAR AO ENCERRAR)
+========================================
+
+- Etapa atual: conferir plano e código.
+- Última funcionalidade validada: preencher com evidências.
+- Próximo arquivo/ação: preencher ao encerrar a sessão.
+- Testes pendentes: registrar os resultados reais.
+- Código não commitado: conferir com git status -sb.
