@@ -12,7 +12,7 @@
 - **Última funcionalidade publicada:** passo 16, edição de papéis (React/Inertia, `PATCH /admin/roles/{role}`, controller, Form Request e autorização).
 - **Commit da funcionalidade:** `25da8fb` (`feat(auth): implementar edição de papéis`). **CI: SUCCESS**, [execução 41364231991](https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/41364231991).
 - **HEAD remoto verificado antes desta atualização (02/11/2026):** `72cb4d6` (merge de atualização do GitHub Actions). **CI: SUCCESS**, [execução 41472395902](https://github.com/ItamarJuniorDEV/E-commerce-eletronics/actions/runs/41472395902).
-- **Próxima funcionalidade:** gestão de permissões por papel, após formalizar a decisão PEN-10. Começar pelo **frontend visual**, depois backend e integração, deixando os **testes para o final da funcionalidade**, antes do commit.
+- **Próxima funcionalidade:** gestão de permissões por papel, após formalizar a decisão PEN-10. Começar pela parte visível e integrá-la ao backend real conforme necessário, deixando os **testes para o final da funcionalidade**, antes do commit.
 - **Estado do Git local na revisão documental:** quatro documentos preparados para commit, conforme saída do terminal enviada pelo usuário. Ao iniciar a próxima sessão, reconferir `git status -sb` e `git log -1 --oneline`; este registro não comprova publicação.
 - **Qualidade local informada em 01/11/2026:** `composer qa` com **85 testes e 262 asserções**; `RoleManagementTest.php` com **23 testes e 66 asserções**. Este é um checkpoint histórico, não uma nova execução.
 - **Navegador:** edição, persistência após F5 e rejeição de slug duplicado foram conferidas manualmente. **Suíte E2E automatizada não comprovada.**
@@ -144,10 +144,10 @@
 
 ## 8. Ordem de implementação sugerida
 
-**Dentro de cada funcionalidade:** explicar o objetivo → frontend visual com dados fictícios → revisão visual → backend → integração → testes ao final → correções/QA → publicação.
+**Dentro de cada funcionalidade:** explicar o objetivo → parte visível → backend e integração reais conforme necessário → revisão visual → testes ao final → correções/QA → publicação.
 
 1. Formalizar a PEN-10 e os critérios de aceite para o catálogo de permissões controlado em código.
-2. Implementar a gestão de permissões por papel, começando pela tela React/Inertia e depois integrando o Laravel.
+2. Implementar a gestão de permissões por papel, construindo a tela React/Inertia em partes e integrando cada parte ao Laravel real.
 3. Definir a exclusão/desativação de papéis, com proteção para papéis usados.
 4. Implementar gestão administrativa de funcionários, atribuição de papéis e proteção do último administrador ativo.
 5. Construir painel administrativo separado com acesso restrito.

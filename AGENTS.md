@@ -10,12 +10,12 @@ Estas regras valem para qualquer IA que participe da implementação do projeto,
 
 ## Regra fixa de trabalho
 
-**Em cada funcionalidade:** entender objetivo e fluxo → **frontend visual React/Inertia primeiro, com dados de exemplo** → revisar a tela → **backend Laravel depois** → integrar → **testar no final da funcionalidade** → corrigir e validar → documentar e publicar.
+**Em cada funcionalidade:** entender objetivo e fluxo → **frontend em pequenas partes reais, sem dados simulados** → revisar a tela → **backend Laravel quando cada parte precisar** → integrar → **testar no final da funcionalidade** → corrigir e validar → documentar e publicar.
 
 - **Não iniciar por testes nem impor TDD vermelho.** Não intercalar testes com a criação de cada arquivo.
 - **Não adiar testes para o fim da etapa ou projeto:** concluída é a funcionalidade testada e validada antes da publicação.
 - O usuário escreve o código de forma guiada; a IA fornece **uma tarefa de cada vez**, em PT-BR, usando passos curtos. Só fornecer código pronto quando solicitado.
-- Protótipos visuais com dados fictícios **não são funcionalidade integrada**. Autorização, validação e regras sensíveis são responsabilidade do backend.
+- Não usar dados simulados na interface nem fingir salvamento ou integração. Autorização, validação e regras sensíveis são responsabilidade do backend.
 - Identificar critérios de aceite e riscos antes do frontend não significa executar testes antes. Se a tarefa não tiver interface, explicar o fluxo ou contrato antes do backend, sem criar tela artificial.
 - Não inventar resultados, não afirmar CI aprovado sem evidência e não descartar trabalho local sem autorização.
 - **Preservar o histórico antigo:** eventuais referências antigas a backend-first ou TDD primeiro são registros do passado, não instruções para novas sessões.
