@@ -1,25 +1,35 @@
 import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
+type Permission = {
+    id: number;
+    slug: string;
+    description: string;
+};
+
 type Role = {
     id: number;
     name: string;
     slug: string;
+    permissions: Permission[];
 };
 
 type RolesProps = {
     roles: Role[];
+    permissions: Permission[];
 };
 
 type EditRoleFormProps = {
     role: Role;
+    permissions: Permission[];
     onCancel: () => void;
 };
 
-function EditRoleForm({ role, onCancel }: EditRoleFormProps) {
+function EditRoleForm({ role, permissions, onCancel }: EditRoleFormProps) {
     const { data, setData, patch, processing, errors } = useForm({
         name: role.name,
         slug: role.slug,
+        permissions: role.permissions.map((permission) => permission.id),
     });
 
     function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
@@ -67,6 +77,43 @@ function EditRoleForm({ role, onCancel }: EditRoleFormProps) {
                     {errors.slug && <p>{errors.slug}</p>}
                 </div>
 
+                <div className="mt-4">
+                    <p>Permissões disponíveis</p>
+
+                    {permissions.map((permission) => (
+                        <label key={permission.id}>
+                            <input
+                                type="checkbox"
+                                checked={data.permissions.includes(
+                                    permission.id,
+                                )}
+                                onChange={(event) => {
+                                    if (event.target.checked) {
+                                        setData('permissions', [
+                                            ...data.permissions,
+                                            permission.id,
+                                        ]);
+                                    } else {
+                                        setData(
+                                            'permissions',
+                                            data.permissions.filter(
+                                                (id) => id !== permission.id,
+                                            ),
+                                        );
+                                    }
+                                }}
+                            />
+                            {permission.description}
+                        </label>
+                    ))}
+
+                    {errors.permissions && (
+                        <p className="mt-2 text-sm text-red-500">
+                            {errors.permissions}
+                        </p>
+                    )}
+                </div>
+
                 <div className="flex gap-3">
                     <button type="submit" disabled={processing}>
                         {processing ? 'Salvando...' : 'Salvar alterações'}
@@ -85,7 +132,7 @@ function EditRoleForm({ role, onCancel }: EditRoleFormProps) {
     );
 }
 
-export default function Roles({ roles }: RolesProps) {
+export default function Roles({ roles, permissions }: RolesProps) {
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -160,6 +207,14 @@ export default function Roles({ roles }: RolesProps) {
                                 {role.name} ({role.slug})
                             </span>
 
+                            <div>
+                                {role.permissions.map((permission) => (
+                                    <span key={permission.id}>
+                                        {permission.description}
+                                    </span>
+                                ))}
+                            </div>
+
                             <button
                                 type="button"
                                 onClick={() => setSelectedRole(role)}
@@ -175,6 +230,7 @@ export default function Roles({ roles }: RolesProps) {
                 <EditRoleForm
                     key={selectedRole.id}
                     role={selectedRole}
+                    permissions={permissions}
                     onCancel={() => setSelectedRole(null)}
                 />
             )}
