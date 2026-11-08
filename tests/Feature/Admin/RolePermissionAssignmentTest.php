@@ -9,7 +9,9 @@ use App\Models\User;
  */
 function createRolePermissionEditor(): array
 {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Administrador',
@@ -180,7 +182,9 @@ test('um administrador com email não verificado não conta como reserva', funct
     ]);
     $backupRole->permissions()->attach($permission->id);
 
-    $backupUser = User::factory()->create();
+    $backupUser = User::factory()->create([
+        'is_staff' => true,
+    ]);
     $backupUser->forceFill(['email_verified_at' => null])->save();
     $backupUser->roles()->attach($backupRole->id);
 
@@ -199,7 +203,9 @@ test('um administrador com email não verificado não conta como reserva', funct
 test('usuário sem permissão não pode alterar vínculos de papéis', function () {
     [, $role, $managementPermission] = createRolePermissionEditor();
 
-    $outsider = User::factory()->create();
+    $outsider = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $response = $this->actingAs($outsider)->patch("/admin/roles/{$role->id}", [
         'name' => 'Administrador',
@@ -225,7 +231,9 @@ test('permite remover acesso quando outro administrador permanece', function () 
 
     $backupRole->permissions()->attach($permission->id);
 
-    $backupUser = User::factory()->create();
+    $backupUser = User::factory()->create([
+        'is_staff' => true,
+    ]);
     $backupUser->roles()->attach($backupRole->id);
 
     $response = $this->actingAs($user)->patch("/admin/roles/{$role->id}", [
