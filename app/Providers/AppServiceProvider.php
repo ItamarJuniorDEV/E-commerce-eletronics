@@ -12,29 +12,34 @@ use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         $this->configureDefaults();
 
-        Gate::define('roles.manage', function (User $user): bool {
-            return $user->hasPermission('roles.manage');
-        });
+        Gate::define(
+            'roles.manage',
+            function (User $user): bool {
+                return $user->is_staff
+                    && $user->is_active
+                    && $user->hasPermission('roles.manage');
+            }
+        );
+
+        Gate::define(
+            'users.manage',
+            function (User $user): bool {
+                return $user->is_staff
+                    && $user->is_active
+                    && $user->hasPermission('users.manage');
+            }
+        );
     }
 
-    /**
-     * Configure default behaviors for production-ready applications.
-     */
     protected function configureDefaults(): void
     {
         Date::use(CarbonImmutable::class);
@@ -43,14 +48,15 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
+        Password::defaults(
+            fn (): ?Password => app()->isProduction()
+                ? Password::min(12)
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised()
+                : null,
         );
     }
 }
