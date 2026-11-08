@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Models\Permission;
@@ -7,7 +6,9 @@ use App\Models\User;
 
 function createUserWithRoleManagementPermission(): User
 {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Administrador',
@@ -44,7 +45,9 @@ test('usuário com permissão pode cadastrar um papel', function () {
 });
 
 test('usuário sem permissão não pode cadastrar um papel', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Vendedor',
@@ -74,7 +77,9 @@ test('usuário sem permissão não pode cadastrar um papel', function () {
 });
 
 test('usuário sem papéis não pode cadastrar um papel', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $response = $this
         ->actingAs($user)
@@ -144,6 +149,7 @@ test('não permite cadastrar papel com slug duplicado', function () {
             'name' => 'Outro Administrador',
             'slug' => 'admin',
         ]);
+
     $response->assertSessionHasErrors(['slug']);
 
     $this->assertDatabaseMissing('roles', [
@@ -251,7 +257,9 @@ test('não permite editar papel com slug duplicado', function () {
 });
 
 test('usuário sem permissão não pode editar um papel', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $userRole = Role::create([
         'name' => 'Atendente',
@@ -288,7 +296,9 @@ test('usuário sem permissão não pode editar um papel', function () {
 });
 
 test('usuário sem papéis não pode editar um papel', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Vendedor',

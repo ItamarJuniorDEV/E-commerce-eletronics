@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Models\Permission;
@@ -7,7 +6,9 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('usuário com permissão pode acessar a gestão de papéis', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Administrador',
@@ -39,7 +40,9 @@ test('usuário com permissão pode acessar a gestão de papéis', function () {
 });
 
 test('usuário sem permissão não pode acessar a gestão de papéis', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Vendedor',
@@ -62,7 +65,9 @@ test('usuário sem permissão não pode acessar a gestão de papéis', function 
 });
 
 test('usuário sem papéis não pode acessar a gestão de papéis', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $response = $this
         ->actingAs($user)
@@ -78,7 +83,9 @@ test('visitante não autenticado é redirecionado para o login', function () {
 });
 
 test('papéis são listados em ordem alfabética', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $salesperson = Role::create([
         'name' => 'Vendedor',

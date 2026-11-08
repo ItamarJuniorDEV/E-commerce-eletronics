@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Models\Permission;
@@ -7,7 +6,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
 test('usuário com permissão pode gerenciar papéis', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Administrador',
@@ -26,7 +27,9 @@ test('usuário com permissão pode gerenciar papéis', function () {
 });
 
 test('usuário sem permissão não pode gerenciar papéis', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     $role = Role::create([
         'name' => 'Vendedor',
@@ -45,7 +48,9 @@ test('usuário sem permissão não pode gerenciar papéis', function () {
 });
 
 test('usuário sem papéis não pode gerenciar papéis', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'is_staff' => true,
+    ]);
 
     expect(Gate::forUser($user)->allows('roles.manage'))->toBeFalse();
 });
