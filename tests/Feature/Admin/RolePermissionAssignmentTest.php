@@ -200,6 +200,78 @@ test('um administrador com email não verificado não conta como reserva', funct
     ]);
 });
 
+test('não permite remover o último acesso de gerenciar funcionários', function () {
+    [$admin, $role, $rolesPermission] = createRolePermissionEditor();
+
+    $usersPermission = Permission::create([
+        'slug' => 'users.manage',
+        'description' => 'Gerenciar funcionários',
+    ]);
+
+    $role->permissions()->attach($usersPermission->id);
+
+    $this->actingAs($admin)
+        ->patch(route('admin.roles.update', $role), [
+            'name' => 'Nome Alterado',
+            'slug' => 'admin',
+            'permissions' => [$rolesPermission->id],
+        ])
+        ->assertSessionHasErrors(['permissions']);
+
+    $this->assertDatabaseHas('roles', [
+        'id' => $role->id,
+        'name' => 'Administrador',
+    ]);
+
+    $this->assertDatabaseHas('permission_role', [
+        'role_id' => $role->id,
+        'permission_id' => $rolesPermission->id,
+    ]);
+
+    $this->assertDatabaseHas('permission_role', [
+        'role_id' => $role->id,
+        'permission_id' => $usersPermission->id,
+    ]);
+});
+
+test('administrador desativado não conta como reserva', function () {
+    [$admin, $role, $permission] = createRolePermissionEditor();
+
+    $backupRole = Role::create([
+        'name' => 'Administrador Reserva',
+        'slug' => 'backup-admin',
+    ]);
+
+    $backupRole->permissions()->attach($permission->id);
+
+    $backupUser = User::factory()->create([
+        'is_staff' => true,
+        'is_active' => false,
+    ]);
+
+    $backupUser->roles()->attach($backupRole->id);
+
+    $this->actingAs($admin)
+        ->patch(route('admin.roles.update', $role), [
+            'name' => 'Nome Alterado',
+            'slug' => 'admin',
+            'permissions' => [],
+        ])
+        ->assertSessionHasErrors(['permissions']);
+
+    $this->assertDatabaseHas('roles', [
+        'id' => $role->id,
+        'name' => 'Administrador',
+    ]);
+
+    $this->assertDatabaseHas('permission_role', [
+        'role_id' => $role->id,
+        'permission_id' => $permission->id,
+    ]);
+
+    expect($backupUser->fresh()->is_active)->toBeFalse();
+});
+
 test('usuário sem permissão não pode alterar vínculos de papéis', function () {
     [, $role, $managementPermission] = createRolePermissionEditor();
 
