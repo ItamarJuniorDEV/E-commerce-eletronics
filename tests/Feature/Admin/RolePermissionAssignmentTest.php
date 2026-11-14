@@ -429,7 +429,10 @@ test('bloqueia alteração administrativa concorrente no PostgreSQL', function (
         DB::purge('lock_test_a');
         DB::purge('lock_test_b');
 
-        config()->forget('database.connections.lock_test_a');
-        config()->forget('database.connections.lock_test_b');
+        $connections = config('database.connections');
+
+        unset($connections['lock_test_a'], $connections['lock_test_b']);
+
+        config()->set('database.connections', $connections);
     }
 });
