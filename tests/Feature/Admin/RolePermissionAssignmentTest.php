@@ -3,6 +3,9 @@
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\LastAdministratorGuard;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @return array{User, Role, Permission}
@@ -200,6 +203,78 @@ test('um administrador com email não verificado não conta como reserva', funct
     ]);
 });
 
+test('não permite remover o último acesso de gerenciar funcionários', function () {
+    [$admin, $role, $rolesPermission] = createRolePermissionEditor();
+
+    $usersPermission = Permission::create([
+        'slug' => 'users.manage',
+        'description' => 'Gerenciar funcionários',
+    ]);
+
+    $role->permissions()->attach($usersPermission->id);
+
+    $this->actingAs($admin)
+        ->patch(route('admin.roles.update', $role), [
+            'name' => 'Nome Alterado',
+            'slug' => 'admin',
+            'permissions' => [$rolesPermission->id],
+        ])
+        ->assertSessionHasErrors(['permissions']);
+
+    $this->assertDatabaseHas('roles', [
+        'id' => $role->id,
+        'name' => 'Administrador',
+    ]);
+
+    $this->assertDatabaseHas('permission_role', [
+        'role_id' => $role->id,
+        'permission_id' => $rolesPermission->id,
+    ]);
+
+    $this->assertDatabaseHas('permission_role', [
+        'role_id' => $role->id,
+        'permission_id' => $usersPermission->id,
+    ]);
+});
+
+test('administrador desativado não conta como reserva', function () {
+    [$admin, $role, $permission] = createRolePermissionEditor();
+
+    $backupRole = Role::create([
+        'name' => 'Administrador Reserva',
+        'slug' => 'backup-admin',
+    ]);
+
+    $backupRole->permissions()->attach($permission->id);
+
+    $backupUser = User::factory()->create([
+        'is_staff' => true,
+        'is_active' => false,
+    ]);
+
+    $backupUser->roles()->attach($backupRole->id);
+
+    $this->actingAs($admin)
+        ->patch(route('admin.roles.update', $role), [
+            'name' => 'Nome Alterado',
+            'slug' => 'admin',
+            'permissions' => [],
+        ])
+        ->assertSessionHasErrors(['permissions']);
+
+    $this->assertDatabaseHas('roles', [
+        'id' => $role->id,
+        'name' => 'Administrador',
+    ]);
+
+    $this->assertDatabaseHas('permission_role', [
+        'role_id' => $role->id,
+        'permission_id' => $permission->id,
+    ]);
+
+    expect($backupUser->fresh()->is_active)->toBeFalse();
+});
+
 test('usuário sem permissão não pode alterar vínculos de papéis', function () {
     [, $role, $managementPermission] = createRolePermissionEditor();
 
@@ -255,4 +330,109 @@ test('permite remover acesso quando outro administrador permanece', function () 
     ]);
 
     expect($backupUser->hasPermission('roles.manage'))->toBeTrue();
+});
+test('bloqueia alteração administrativa concorrente no PostgreSQL', function () {
+    if (
+        DB::connection()->getDriverName() !== 'pgsql'
+        || DB::connection()->getDatabaseName() !== 'ecommerce_ci'
+    ) {
+        $this->markTestSkipped('Exige o PostgreSQL isolado do CI.');
+    }
+
+    $original = DB::getDefaultConnection();
+    $config = config("database.connections.{$original}");
+
+    config()->set('database.connections.lock_test_a', $config);
+    config()->set('database.connections.lock_test_b', $config);
+
+    $a = DB::connection('lock_test_a');
+    $b = DB::connection('lock_test_b');
+
+    $permissionId = null;
+    $created = false;
+
+    try {
+        $permissionId = $a->table('permissions')
+            ->where('slug', 'roles.manage')
+            ->value('id');
+
+        if ($permissionId === null) {
+            $permissionId = $a->table('permissions')->insertGetId([
+                'slug' => 'roles.manage',
+                'description' => 'Gerenciar papéis',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $created = true;
+        }
+
+        // Transação A bloqueia a permissão.
+        $a->beginTransaction();
+
+        DB::setDefaultConnection('lock_test_a');
+
+        app(LastAdministratorGuard::class)->lock();
+
+        DB::setDefaultConnection($original);
+
+        // Transação B tenta bloquear a mesma permissão.
+        $b->beginTransaction();
+
+        $blocked = false;
+
+        try {
+            $b->select(
+                'SELECT id FROM permissions WHERE id = ? FOR UPDATE NOWAIT',
+                [$permissionId]
+            );
+        } catch (QueryException $exception) {
+            $blocked = ($exception->errorInfo[0] ?? null) === '55P03';
+        } finally {
+            $b->rollBack();
+        }
+
+        $this->assertTrue(
+            $blocked,
+            'A segunda transação deveria ser bloqueada.'
+        );
+
+        $a->commit();
+
+        $b->beginTransaction();
+
+        $rows = $b->select(
+            'SELECT id FROM permissions WHERE id = ? FOR UPDATE NOWAIT',
+            [$permissionId]
+        );
+
+        $this->assertCount(1, $rows);
+
+        $b->rollBack();
+    } finally {
+        DB::setDefaultConnection($original);
+
+        if ($b->transactionLevel() > 0) {
+            $b->rollBack();
+        }
+
+        if ($a->transactionLevel() > 0) {
+            $a->rollBack();
+        }
+
+        if ($created && $permissionId !== null) {
+            $a->table('permissions')
+                ->where('id', $permissionId)
+                ->delete();
+        }
+
+        DB::purge('lock_test_a');
+        DB::purge('lock_test_b');
+
+        $connections = config('database.connections');
+
+        unset($connections['lock_test_a'], $connections['lock_test_b']);
+
+        config()->set('database.connections', $connections);
+    }
 });

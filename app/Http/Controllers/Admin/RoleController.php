@@ -7,10 +7,9 @@ use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\User;
+use App\Support\LastAdministratorGuard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -44,7 +43,8 @@ class RoleController extends Controller
 
     public function update(
         UpdateRoleRequest $request,
-        Role $role
+        Role $role,
+        LastAdministratorGuard $guard,
     ): RedirectResponse {
         $data = $request->validated();
 
@@ -57,78 +57,21 @@ class RoleController extends Controller
         DB::transaction(function () use (
             $role,
             $data,
-            $permissionIds
+            $permissionIds,
+            $guard
         ): void {
-            if ($permissionIds !== null) {
-                // Serializa as alterações de permissões
-                // administrativas feitas por este fluxo.
-                $managementPermission = Permission::query()
-                    ->where('slug', 'roles.manage')
-                    ->lockForUpdate()
-                    ->first();
 
-                if ($managementPermission !== null) {
-                    $roleHasManagementPermission = $role
-                        ->permissions()
-                        ->where(
-                            'permissions.id',
-                            $managementPermission->getKey()
-                        )
-                        ->exists();
+            $guard->lock();
 
-                    $isRemovingManagementPermission =
-                        $roleHasManagementPermission
-                        && ! in_array(
-                            $managementPermission->getKey(),
-                            $permissionIds,
-                            true
-                        );
-
-                    if ($isRemovingManagementPermission) {
-                        $hasOtherManager = User::query()
-                            ->whereNotNull('email_verified_at')
-                            ->whereHas(
-                                'roles',
-                                function ($query) use (
-                                    $role,
-                                    $managementPermission
-                                ) {
-                                    $query
-                                        ->where(
-                                            'roles.id',
-                                            '!=',
-                                            $role->getKey()
-                                        )
-                                        ->whereHas(
-                                            'permissions',
-                                            function ($permissionQuery) use (
-                                                $managementPermission
-                                            ) {
-                                                $permissionQuery->where(
-                                                    'permissions.id',
-                                                    $managementPermission
-                                                        ->getKey()
-                                                );
-                                            }
-                                        );
-                                }
-                            )
-                            ->exists();
-
-                        if (! $hasOtherManager) {
-                            throw ValidationException::withMessages([
-                                'permissions' => 'Não é possível remover o último acesso administrativo.',
-                            ]);
-                        }
-                    }
-                }
-            }
+            $before = $guard->snapshot();
 
             $role->update($data);
 
             if ($permissionIds !== null) {
                 $role->permissions()->sync($permissionIds);
             }
+
+            $guard->ensureRetained($before, 'permissions');
         }, 3);
 
         return to_route('admin.roles.index');
